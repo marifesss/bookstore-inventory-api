@@ -6,6 +6,8 @@ interface BookTableProps {
   books: Book[];
   isPending: boolean;
   onEdit: (book: Book) => void;
+  onCalculatePrice: (book: Book) => void;
+  onDelete: (book: Book) => void;
 }
 
 /** A number that is compared down a column: mono, right-aligned. */
@@ -43,7 +45,15 @@ function SkeletonRows() {
   );
 }
 
-export function BookTable({ books, isPending, onEdit }: BookTableProps) {
+export function BookTable({
+  books,
+  isPending,
+  onEdit,
+  onCalculatePrice,
+  onDelete,
+}: BookTableProps) {
+  const rowAction =
+    'rounded-field px-2 py-1 font-medium transition-colors hover:bg-paper';
   const headerCell = 'px-4 text-xs font-medium uppercase tracking-[0.06em] text-muted';
 
   return (
@@ -88,10 +98,24 @@ export function BookTable({ books, isPending, onEdit }: BookTableProps) {
                 <td className="px-4 text-right whitespace-nowrap">
                   <button
                     type="button"
+                    onClick={() => onCalculatePrice(book)}
+                    className={`${rowAction} text-forest`}
+                  >
+                    Calcular precio
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => onEdit(book)}
-                    className="rounded-field px-2 py-1 font-medium text-ink transition-colors hover:bg-paper"
+                    className={`${rowAction} text-ink`}
                   >
                     Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(book)}
+                    className={`${rowAction} text-danger`}
+                  >
+                    Eliminar
                   </button>
                 </td>
               </tr>
@@ -125,13 +149,29 @@ export function BookTable({ books, isPending, onEdit }: BookTableProps) {
                     Venta <Amount value={book.selling_price_local} />
                   </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onEdit(book)}
-                  className="mt-3 h-10 w-full rounded-card border border-line font-medium text-ink"
-                >
-                  Editar
-                </button>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onCalculatePrice(book)}
+                    className="h-10 flex-1 rounded-card border border-line font-medium text-forest"
+                  >
+                    Calcular
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onEdit(book)}
+                    className="h-10 flex-1 rounded-card border border-line font-medium text-ink"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(book)}
+                    className="h-10 flex-1 rounded-card border border-line font-medium text-danger"
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </li>
             ))}
       </ul>
