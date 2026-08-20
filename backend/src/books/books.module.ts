@@ -10,9 +10,11 @@ import { Module } from '@nestjs/common';
   import { UpdateBookUseCase } from './application/use-cases/update-book.use-case';
   import { BOOK_REPOSITORY } from './domain/ports/book.repository';
   import { PrismaBookRepository } from './infrastructure/persistence/prisma-book.repository';
+   import { BooksController } from './presentation/books.controller';
 
   @Module({
     imports: [PrismaModule],
+    controllers: [BooksController],
     providers: [
       { provide: BOOK_REPOSITORY, useClass: PrismaBookRepository },
 
