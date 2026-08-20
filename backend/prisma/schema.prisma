@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id                Int      @id @default(autoincrement())
+  title             String   @db.VarChar(255)
+  author            String   @db.VarChar(255)
+  isbn              String   @unique @db.VarChar(13)
+  costUsd           Decimal  @map("cost_usd") @db.Decimal(12, 2)
+  sellingPriceLocal Decimal? @map("selling_price_local") @db.Decimal(12, 2)
+  stockQuantity     Int      @map("stock_quantity")
+  category          String   @db.VarChar(120)
+  supplierCountry   String   @map("supplier_country") @db.Char(2)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([stockQuantity])
+  @@map("books")
+}

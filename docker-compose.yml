@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: bookstore-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bookstore}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bookstore}
+      POSTGRES_DB: ${POSTGRES_DB:-bookstore}
+    ports:
+      # Puerto del host configurable: 5432 suele estar ocupado por una
+      # instalacion nativa de Postgres. Dentro de la red de compose siempre es 5432.
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-bookstore} -d ${POSTGRES_DB:-bookstore}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+    container_name: bookstore-backend
+    restart: unless-stopped
+    environment:
+      # Dentro de la red de compose el host de la base es el nombre del servicio.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bookstore}:${POSTGRES_PASSWORD:-bookstore}@db:5432/${POSTGRES_DB:-bookstore}?schema=public
+      PORT: ${PORT:-3000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      LOCAL_CURRENCY: ${LOCAL_CURRENCY:-EUR}
+      DEFAULT_MARGIN_PERCENTAGE: ${DEFAULT_MARGIN_PERCENTAGE:-40}
+      EXCHANGE_RATE_API_URL: ${EXCHANGE_RATE_API_URL:-https://api.exchangerate-api.com/v4/latest/USD}
+      EXCHANGE_RATE_FALLBACK: ${EXCHANGE_RATE_FALLBACK:-0.85}
+      EXCHANGE_RATE_TIMEOUT_MS: ${EXCHANGE_RATE_TIMEOUT_MS:-5000}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Vite congela las variables en tiempo de build, no de arranque.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+    container_name: bookstore-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

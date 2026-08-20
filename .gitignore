@@ -2,8 +2,10 @@ node_modules/
 dist/
 build/
 .env
+.env.local
 *.log
 .DS_Store
+coverage/
 
 # Notas de trabajo, no entregables
 CLAUDE.md
