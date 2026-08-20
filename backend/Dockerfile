@@ -16,4 +16,5 @@ EXPOSE 3000
 
 # `migrate deploy` aplica las migraciones existentes sin pedir confirmacion
 # ni regenerar nada: es el comando pensado para arranque automatico.
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
+# El seed deja el catalogo en un estado conocido para que la demo tenga datos.
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node dist/main.js"]
