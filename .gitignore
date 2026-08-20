@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.env
+*.log
+.DS_Store
+
+# Notas de trabajo, no entregables
+CLAUDE.md
+docs/SPEC.md
+docs/ARCHITECTURE.md
+docs/DESIGN.md
+docs/PLAN.md
