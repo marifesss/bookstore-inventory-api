@@ -31,6 +31,11 @@ import {
     SearchBooksQueryDto,
   } from './dto/query-books.dto';
   import { UpdateBookDto } from './dto/update-book.dto';
+  import { CalculateSellingPriceUseCase } from '../application/use-cases/calculate-selling-price.use-case';
+  import {
+    PriceCalculationResponseDto,
+    type PriceCalculationResponse,
+  } from './dto/price-calculation-response.dto';
 
   @Controller('books')
   export class BooksController {
@@ -42,7 +47,9 @@ import {
       private readonly deleteBook: DeleteBookUseCase,
       private readonly searchBooks: SearchBooksByCategoryUseCase,
       private readonly listLowStockBooks: ListLowStockBooksUseCase,
+      private readonly calculateSellingPrice: CalculateSellingPriceUseCase,
     ) {}
+    
 
     /** 201 Created is NestJS's default for POST. */
     @Post()
@@ -101,6 +108,16 @@ import {
     @HttpCode(HttpStatus.NO_CONTENT)
     async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
       await this.deleteBook.execute(id);
+    }
+
+     @Post(':id/calculate-price')
+    @HttpCode(HttpStatus.OK)
+    async calculatePrice(
+      @Param('id', ParseIntPipe) id: number,
+    ): Promise<PriceCalculationResponse> {
+      const result = await this.calculateSellingPrice.execute(id);
+
+      return PriceCalculationResponseDto.fromResult(result);
     }
 
     private toCommand(dto: CreateBookDto) {
