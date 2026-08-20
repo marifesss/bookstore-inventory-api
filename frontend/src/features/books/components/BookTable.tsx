@@ -5,6 +5,7 @@ import { DEFAULT_LOW_STOCK_THRESHOLD, PAGE_SIZE } from '../hooks/useBooks';
 interface BookTableProps {
   books: Book[];
   isPending: boolean;
+  onEdit: (book: Book) => void;
 }
 
 /** A number that is compared down a column: mono, right-aligned. */
@@ -33,7 +34,7 @@ function SkeletonRows() {
     <>
       {Array.from({ length: PAGE_SIZE }, (_, row) => (
         <tr key={row} className="h-14 border-b border-line last:border-0">
-          <td colSpan={6} className="px-4">
+          <td colSpan={7} className="px-4">
             <div className="h-4 animate-pulse rounded-field bg-paper" />
           </td>
         </tr>
@@ -42,7 +43,7 @@ function SkeletonRows() {
   );
 }
 
-export function BookTable({ books, isPending }: BookTableProps) {
+export function BookTable({ books, isPending, onEdit }: BookTableProps) {
   const headerCell = 'px-4 text-xs font-medium uppercase tracking-[0.06em] text-muted';
 
   return (
@@ -57,6 +58,7 @@ export function BookTable({ books, isPending }: BookTableProps) {
             <th className={`${headerCell} text-right`}>Stock</th>
             <th className={`${headerCell} text-right`}>Costo USD</th>
             <th className={`${headerCell} text-right`}>Precio venta</th>
+            <th className={`${headerCell} text-right`}>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -82,6 +84,15 @@ export function BookTable({ books, isPending }: BookTableProps) {
                 </td>
                 <td className="px-4 text-right">
                   <Amount value={book.selling_price_local} />
+                </td>
+                <td className="px-4 text-right whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={() => onEdit(book)}
+                    className="rounded-field px-2 py-1 font-medium text-ink transition-colors hover:bg-paper"
+                  >
+                    Editar
+                  </button>
                 </td>
               </tr>
             ))
@@ -114,6 +125,13 @@ export function BookTable({ books, isPending }: BookTableProps) {
                     Venta <Amount value={book.selling_price_local} />
                   </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => onEdit(book)}
+                  className="mt-3 h-10 w-full rounded-card border border-line font-medium text-ink"
+                >
+                  Editar
+                </button>
               </li>
             ))}
       </ul>
